@@ -1,0 +1,21 @@
+==>Base-1<==
+Ret=> Instagram User Caprute
+\*/ Username:
+MemoryString=>re_x_tor
+<==>
+
+==>Config-1<==
+URL=>https://www.instagram.com/|memorystring-1|/
+Method=>GET
+<==>
+
+==>Request-1<==
+RequestManage=>1.getdata
+MemoryString=>sourcepage
+Memorystring=>Regex-2{"followed_by": {"count": (.*?)},}
+<==>
+
+==>Print-1<==
+Ret=>Followers:
+Ret=>|memorystring-3|
+<==>

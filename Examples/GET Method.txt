@@ -1,0 +1,20 @@
+==>Base-1<==
+Ret=> GET Method example
+MemoryString=>https://www.google.com/
+<==>
+
+==>Config-1<==
+URL=>|memorystring-1|
+Method=>GET
+<==>
+
+==>Request-1<==
+RequestManage=>1.getdata
+MemoryString=>sourcepage
+<==>
+
+==>Print-1<==
+Ret=>URL: |memorystring-1|
+Ret=>Source:
+Ret=>|memorystring-2|
+<==>
