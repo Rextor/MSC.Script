@@ -36,7 +36,7 @@ namespace MSC.Script
         Base,
         Unkown
     }
-    class MemoryString
+    public class MemoryString
     {
         List<string> ListM { set; get; }
         public void Creat()
@@ -52,7 +52,7 @@ namespace MSC.Script
             return ListM[Index];
         }
     }
-    class RequestDef
+    public class RequestDef
     {
         RequestManage Request { set; get; }
         public RequestDef Helper { set; get; }
@@ -98,7 +98,7 @@ namespace MSC.Script
                 }
         }
     }
-    class ConfigDef
+    public class ConfigDef
     {
         Config config { set; get; }
         public void Create()
