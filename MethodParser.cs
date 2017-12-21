@@ -1,4 +1,4 @@
-﻿using MSC;
+using MSC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +10,11 @@ namespace MSC.Script
 {
     public class MethodParser
     {
-        public Controller cll = new Controller();
-        public CommendLine co;
-        public void ParseMethods(List<Method> list, CommendLine cl)
+        public Controller Controller = new Controller();
+        public CommendLine CMD;
+        public void ParseMethods(List<Method> list, CommendLine cmd)
         {
-            co = cl;
+            CMD = cmd;
             foreach (Method method in list)
             {
                 switch (method.Type)
@@ -36,8 +36,8 @@ namespace MSC.Script
         }
         public void ParseRequestMethod(Method method)
         {
-            cll.NewRequestDef();
-            RequestDef RD = cll.GetLastRequestDef();
+            Controller.NewRequestDef();
+            RequestDef RD = Controller.GetLastRequestDef();
             foreach (Instruction li in method.Instructions)
             {
                 Instruction line = li;
@@ -48,7 +48,7 @@ namespace MSC.Script
 
                         string[] Rs = line.Value.Split('.');
 
-                        ConfigDef cd = cll.GetConfigdef(int.Parse(Rs[0]));
+                        ConfigDef cd = Controller.GetConfigdef(int.Parse(Rs[0]));
                         RequestDef helper = null;
                         if (Rs.Length >= 3)
                         {
@@ -56,7 +56,7 @@ namespace MSC.Script
                                 if (Rs[2] == "this")
                                     helper = RD;
                                 else
-                                    helper = cll.GetRequestDef(int.Parse(Rs[2]));
+                                    helper = Controller.GetRequestDef(int.Parse(Rs[2]));
                             }
                             catch { }
                         }
@@ -69,13 +69,13 @@ namespace MSC.Script
                         break;
                     case OpCode.MemoryString:
                         if (line.Value.ToLower().StartsWith("regex"))
-                            cll.AddMemodyString(ParseRegex(line.Value));
+                            Controller.AddMemodyString(ParseRegex(line.Value));
                         else if (line.Value.ToLower() == "sourcepage")
-                            cll.AddMemodyString(RD.GetSourcePage());
+                            Controller.AddMemodyString(RD.GetSourcePage());
                         else if (line.Value.ToLower() == "cookies")
-                            cll.AddMemodyString(RD.GetCookies());
+                            Controller.AddMemodyString(RD.GetCookies());
                         else
-                            cll.AddMemodyString(line.Value);
+                            Controller.AddMemodyString(line.Value);
                         break;
                     case OpCode.Ret:
                         string val = line.Value;
@@ -90,12 +90,12 @@ namespace MSC.Script
                         break;
                     case OpCode.SetConfig:
                         string[] Res = line.Value.Split(':');
-                        ConfigDef cr = cll.GetConfigdef(int.Parse(Res[0]));
+                        ConfigDef cr = Controller.GetConfigdef(int.Parse(Res[0]));
                         Instruction doc = Instruction.ReadLine(Res[1]);
                         SetConfig(doc, cr);
                         break;
                     default:
-                        co.OutPuter.AddMessage("The" + line.Type.ToString() + " Module not support on Request method");
+                        CMD.OutPuter.AddMessage("The" + line.Type.ToString() + " Module not support on Request method");
                         break;
                 }
             }
@@ -139,22 +139,22 @@ namespace MSC.Script
             {
                 if (strRet1[1].ToLower() == "all")
                 {
-                    string[] strings = cll.GetAllMemoryString();
+                    string[] strings = Controller.GetAllMemoryString();
                     foreach (string item in strings)
                     {
-                        co.OutPuter.AddMessage(item, Log.Type.OutPut);
+                        CMD.OutPuter.AddMessage(item, Log.Type.OutPut);
                     }
                     return strings.ToString();
                 }
                 else if (strRet1[1].ToLower().Contains(":"))
                 {
                     string[] startend = strRet1[1].Split(':');
-                    string[] strings = cll.GetHovertMemoryString(int.Parse(startend[0]), int.Parse(startend[1]));
+                    string[] strings = Controller.GetHovertMemoryString(int.Parse(startend[0]), int.Parse(startend[1]));
                     return strings.ToString();
                 }
                 else
                 {
-                    string outs = cll.GetMemoryString(int.Parse(strRet1[1]));
+                    string outs = Controller.GetMemoryString(int.Parse(strRet1[1]));
                     return outs;
                 }
             }
@@ -173,13 +173,13 @@ namespace MSC.Script
                 switch (li.Type)
                 {
                     case OpCode.MemoryString:
-                        cll.AddMemodyString(li.Value);
+                        Controller.AddMemodyString(li.Value);
                         break;
                     case OpCode.Ret:
                         ParseRetModule(li);
                         break;
                     default:
-                        co.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Print method");
+                        CMD.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Print method");
                         break;
                 }
             }
@@ -188,7 +188,7 @@ namespace MSC.Script
         {
             if (line.Value.ToLower().StartsWith(OpCode.MemoryString.ToString().ToLower()))
                 ParseMemoryString(line.Value);
-            else co.OutPuter.AddMessage(line.Value, Log.Type.OutPut);
+            else CMD.OutPuter.AddMessage(line.Value, Log.Type.OutPut);
         }
         public void ParseBaseMethod(Method method)
         {
@@ -199,13 +199,13 @@ namespace MSC.Script
                 switch (li.Type)
                 {
                     case OpCode.MemoryString:
-                        cll.AddMemodyString(li.Value);
+                        Controller.AddMemodyString(li.Value);
                         break;
                     case OpCode.Ret:
                         ParseRetModule(li);
                         break;
                     default:
-                        co.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Base method");
+                        CMD.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Base method");
                         break;
                 }
             }
@@ -263,21 +263,21 @@ namespace MSC.Script
                     config.SetGzipDecomprossor(line.Value);
                     break;
                 default:
-                    co.OutPuter.AddMessage("The " + line.Type.ToString() + " Module not support on Config method");
+                    CMD.OutPuter.AddMessage("The " + line.Type.ToString() + " Module not support on Config method");
                     break;
             }
         }
         public void ParseConfigMethod(Method method)
         {
-            cll.NewConfigDef();
+            Controller.NewConfigDef();
             foreach(Instruction line in method.Instructions)
             {
                 Instruction li = line;
                 li = ReplaceMemoryStringsOnValue(line);
                 if (li.Type == OpCode.MemoryString)
-                    cll.AddMemodyString(li.Value);
+                    Controller.AddMemodyString(li.Value);
                 else
-                    SetConfig(li, cll.GetLastConfigdef());
+                    SetConfig(li, Controller.GetLastConfigdef());
             }
 
         }
