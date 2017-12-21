@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace MSC.Script
 {
-    class MethodParser
+    public class MethodParser
     {
-        Controller cll = new Controller();
-        CommendLine co;
+        public Controller cll = new Controller();
+        public CommendLine co;
         public void ParseMethods(List<Method> list, CommendLine cl)
         {
             co = cl;
@@ -281,7 +281,7 @@ namespace MSC.Script
             }
 
         }
-        private Instruction ReplaceMemoryStringsOnValue(Instruction line)
+        public Instruction ReplaceMemoryStringsOnValue(Instruction line)
         {
             foreach (Match m in Regex.Matches(line.Value.ToLower(), @"\|memorystring-(.*?)\|"))
             {
