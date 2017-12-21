@@ -11,6 +11,21 @@ namespace MSC.Script
         public MethodType Type { set; get; }
         public int IndexPous { set; get; }
         public int IndexPlay { set; get; }
+        public static MethodType GetPous(string Type)
+        {
+            var List = Enum.GetValues(typeof(MethodType)).Cast<MethodType>().ToList();
+            MethodType ReturnDef = MethodType.Unkown;
+            foreach (MethodType item in List)
+                if (Type.ToLower() == item.ToString().ToLower())
+                {
+                    ReturnDef = item;
+                    break;
+                }
+            if (ReturnDef != MethodType.Unkown)
+                return ReturnDef;
+            else
+                throw new Exception("Unkown Pous! ==> " + Type);
+        }
     }
     public class Body
     {
@@ -84,21 +99,6 @@ namespace MSC.Script
                 return true;
             else return false;
         }
-        MethodType GetPous(string Type)
-        {
-            var List = Enum.GetValues(typeof(MethodType)).Cast<MethodType>().ToList();
-            MethodType ReturnDef = MethodType.Unkown;
-            foreach (MethodType item in List)
-                if (Type.ToLower() == item.ToString().ToLower())
-                {
-                    ReturnDef = item;
-                    break;
-                }
-            if (ReturnDef != MethodType.Unkown)
-                return ReturnDef;
-            else
-                throw new Exception("Unkown Pous! ==> " + Type);
-        }
     }
     public class Instruction
     {
@@ -116,7 +116,7 @@ namespace MSC.Script
             line.Value = Line.Substring(start + 2, Line.Length - start - 2);
             return line;
         }
-        static OpCode GetModule(string Type)
+        public static OpCode GetModule(string Type)
         {
             var List = Enum.GetValues(typeof(OpCode)).Cast<OpCode>().ToList();
             OpCode ReturnDef = OpCode.Unkown;
