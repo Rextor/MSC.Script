@@ -47,7 +47,7 @@ namespace MSC.Script
                         Match mh = Regex.Match(Lines[i], @"==>(.*?)<==");
                         string valuenow = mh.Groups[1].Value.ToString();
                         string[] st = valuenow.Split('-');
-                        method.Type = GetPous(st[0]);
+                        method.Type = Method.GetPous(st[0]);
                         if (st.Length == 2)
                         {
                             try
