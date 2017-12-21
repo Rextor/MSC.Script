@@ -7,7 +7,7 @@ using MSC;
 
 namespace MSC.Script
 {
-    class Controller
+    public class Controller
     {
         List<string> MemoryString = new List<string>();
         public string GetMemoryString(int Index)
