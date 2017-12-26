@@ -212,6 +212,7 @@ namespace MSC.Script
         }
         private void SetConfig(Instruction line, ConfigDef config)
         {
+            line = ReplaceMemoryStringsOnValue(line);
             switch (line.Type)
             {
                 case OpCode.URL:
