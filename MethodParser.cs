@@ -91,7 +91,9 @@ namespace MSC.Script
                     case OpCode.SetConfig:
                         string[] Res = line.Value.Split(':');
                         ConfigDef cr = Controller.GetConfigdef(int.Parse(Res[0]));
-                        Instruction doc = Instruction.ReadLine(Res[1]);
+                        int indexd = li.Value.IndexOf(':');
+                        Instruction doc = Instruction.ReadLine(line.Value.Substring(indexd + 1, line.Value.Length - indexd - 1));
+                        doc = ReplaceMemoryStringsOnValue(doc);
                         SetConfig(doc, cr);
                         break;
                     default:
@@ -212,7 +214,6 @@ namespace MSC.Script
         }
         private void SetConfig(Instruction line, ConfigDef config)
         {
-            line = ReplaceMemoryStringsOnValue(line);
             switch (line.Type)
             {
                 case OpCode.URL:
@@ -284,7 +285,9 @@ namespace MSC.Script
         }
         public Instruction ReplaceMemoryStringsOnValue(Instruction line)
         {
-            foreach (Match m in Regex.Matches(line.Value.ToLower(), @"\|memorystring-(.*?)\|"))
+            string pattern = @"\|memorystring-(.*?)\|";
+
+            foreach (Match m in Regex.Matches(line.Value, pattern, RegexOptions.IgnoreCase))
             {
                 if (m.Groups.Count == 0)
                     continue;
@@ -292,7 +295,7 @@ namespace MSC.Script
                     continue;
 
                 try {
-                    line.Value = line.Value.ToLower().Replace("|memorystring-" + m.Groups[1].Value + "|", ParseMemoryString("memorystring-" + m.Groups[1].Value));
+                    line.Value = line.Value.Replace(m.Value, ParseMemoryString("memorystring-" + m.Groups[1].Value));
                 }
                 catch { }
             }
