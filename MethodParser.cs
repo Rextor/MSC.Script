@@ -108,11 +108,11 @@ namespace MSC.Script
             string[] arr = value.Substring(0, startindex).Split('-');
             string indexmemroy = arr[1];
             string input = ParseMemoryString("MemoryString-" + indexmemroy);
-            string pattern = value.Substring(value.IndexOf('{') + 1, value.LastIndexOf("}") - 7 - indexmemroy.Length);
+            string pattern = value.Substring(value.IndexOf('{') + 1, value.LastIndexOf("}") - value.IndexOf('{') - indexmemroy.Length);
             int indexmatch = 0;
-            if (arr.Length >= 2) indexmatch = int.Parse(arr[2]);
+            if (arr.Length >= 3) indexmatch = int.Parse(arr[2]);
             int grpmatch = 1;
-            if (arr.Length >= 3) int.Parse(arr[3]);
+            if (arr.Length >= 4) int.Parse(arr[3]);
             MatchCollection mc = Regex.Matches(input, pattern);
             return mc[indexmatch].Groups[grpmatch].Value;
         }
