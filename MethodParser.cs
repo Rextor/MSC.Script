@@ -105,16 +105,16 @@ namespace MSC.Script
         private string ParseRegex(string value)
         {
             int startindex = value.IndexOf("{");
-            string indexmemroy = value.Substring(0, startindex).Split('-')[1];
+            string[] arr = value.Substring(0, startindex).Split('-');
+            string indexmemroy = arr[1];
             string input = ParseMemoryString("MemoryString-" + indexmemroy);
             string pattern = value.Substring(value.IndexOf('{') + 1, value.LastIndexOf("}") - 7 - indexmemroy.Length);
-
+            int indexmatch = 0;
+            if (arr.Length >= 2) indexmatch = int.Parse(arr[2]);
+            int grpmatch = 1;
+            if (arr.Length >= 3) int.Parse(arr[3]);
             MatchCollection mc = Regex.Matches(input, pattern);
-            foreach (Match ma in mc)
-            {
-                return ma.Groups[1].Value;
-            }
-            return "";
+            return mc[indexmatch].Groups[grpmatch].Value;
         }
         private RequestDef GetData(ConfigDef Cd, RequestDef helper)
         {
