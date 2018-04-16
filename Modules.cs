@@ -1,4 +1,4 @@
-﻿using MSC.Brute;
+using MSC.Brute;
 using System.Collections.Generic;
 
 namespace MSC.Script
@@ -58,6 +58,10 @@ namespace MSC.Script
         public RequestDef Helper { set; get; }
         public ConfigDef configdef { set; get; }
         Requester Rr = new Requester();
+        public RequestManage GetManage()
+        {
+            return Request;
+        }
         public void Create()
         {
             Request = new RequestManage();
@@ -104,6 +108,10 @@ namespace MSC.Script
         public void Create()
         {
             config = new Config();
+        }
+        public void SetConfig(Config _config)
+        {
+            config = _config;
         }
         public Config GetConfig()
         {
