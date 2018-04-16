@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -36,11 +36,16 @@ namespace MSC.Script
             int indexplay = 0;
             Method method = new Method();
             for (int i = 0; i < Lines.Length; i++)
-            {  
+            {
+                if(!IsValidLine(Lines[i]))
+                    throw new Exception("Error > The instruction not valid => line:" + (i + 1));
                 if (!InAdding)
                 {
+                    if (IsEndMethodLine(Lines[i])) throw new Exception("Error > The method hasn't end instruction => line:" + (i + 1));
                     if (IsStartMethodLine(Lines[i]))
                     {
+                        if(InAdding)
+                            throw new Exception("method have not end instruction! ==>" + method.Type.ToString());
                         indexplay++;
                         method = new Method();
                         method.IndexPlay = indexplay;
@@ -61,14 +66,22 @@ namespace MSC.Script
                 }
                 else
                 {
+                    if (IsStartMethodLine(Lines[i])) throw new Exception("Error > The method need end instruction => line:" + (i + 1));
                     if (!IsEndMethodLine(Lines[i]))
                     {
                         if (!IsCommendLine(Lines[i]))
                         {
                             if (!string.IsNullOrWhiteSpace(Lines[i]))
                             {
-                                Instruction line = new Instruction();
-                                method.Instructions.Add(Instruction.ReadLine(Lines[i]));
+                                try
+                                {
+                                    Instruction line = Instruction.ReadLine(Lines[i]);
+                                    line.LineIndex = i;
+                                    method.Instructions.Add(line);
+                                }catch
+                                {
+                                    throw new Exception("Error > Can't read line ==> line:" + (i + 1));
+                                }
                             }
                         }
                     }
@@ -78,6 +91,15 @@ namespace MSC.Script
             if(InAdding == true)
                 throw new Exception("A method haven't end line!");
             return Methods;
+        }
+        bool IsValidLine(string Line)
+        {
+            if (IsCommendLine(Line)) return true;
+            if (string.IsNullOrWhiteSpace(Line)) return true;
+            if (Line.Contains("=>")) return true;
+            if (Line.Contains("<==>")) return true;
+            if (Line.Contains("<=")) return true;
+            return false;
         }
         bool IsCommendLine(string Line)
         {
@@ -108,6 +130,7 @@ namespace MSC.Script
         }
         public OpCode Type { set; get; }
         public string Value { set; get; }
+        public int LineIndex { set; get; }
         public static Instruction ReadLine(string Line)
         {
             Instruction line = new Instruction();
