@@ -16,91 +16,112 @@ namespace MSC.Script
         {
             CMD = cmd;
             foreach (Method method in list)
+                ExecuteMethod(method);
+        }
+        public void ExecuteMethod(Method method)
+        {
+            switch (method.Type)
             {
-                switch (method.Type)
-                {
-                    case MethodType.Config:
-                        ParseConfigMethod(method);
-                        break;
-                    case MethodType.Request:
-                        ParseRequestMethod(method);
-                        break;
-                    case MethodType.Print:
-                        ParsePrintMethod(method);
-                        break;
-                    case MethodType.Base:
-                        ParseBaseMethod(method);
-                        break;
-                }
+                case MethodType.Config:
+                    Controller.NewConfigDef();
+                    ExecuteInstructions(method);
+                    break;
+                case MethodType.Request:
+                    Controller.NewRequestDef();
+                    ExecuteInstructions(method);
+                    break;
+                case MethodType.Print:
+                case MethodType.Base:
+                    ExecuteInstructions(method);
+                    break;
             }
         }
-        public void ParseRequestMethod(Method method)
+        public void ExecuteInstructions(Method method)
         {
-            Controller.NewRequestDef();
-            RequestDef RD = Controller.GetLastRequestDef();
-            foreach (Instruction li in method.Instructions)
+            foreach (Instruction inst in method.Instructions)
+                ExecuteInstruction(inst, method.Type);
+        }
+        public void ExecuteInstruction(Instruction inst, MethodType type)
+        {
+            inst = ReplaceMemoryStringsOnValue(inst);
+            switch (type)
             {
-                Instruction line = li;
-                line = ReplaceMemoryStringsOnValue(line);
-                switch (line.Type)
-                {
-                    case OpCode.RequestManage:
-
-                        string[] Rs = line.Value.Split('.');
-
-                        ConfigDef cd = Controller.GetConfigdef(int.Parse(Rs[0]));
-                        RequestDef helper = null;
-                        if (Rs.Length >= 3)
-                        {
-                            try {
-                                if (Rs[2] == "this")
-                                    helper = RD;
-                                else
-                                    helper = Controller.GetRequestDef(int.Parse(Rs[2]));
-                            }
-                            catch { }
-                        }
-
-                        if (Rs[1].ToLower() == "getdata")
-                            RD = GetData(cd, helper);
-                        else if (Rs[1].ToLower() == "postdata")
-                            RD = PostData(cd, helper);
-
-                        break;
-                    case OpCode.MemoryString:
-                        if (line.Value.ToLower().StartsWith("regex"))
-                            Controller.AddMemodyString(ParseRegex(line.Value));
-                        else if (line.Value.ToLower() == "sourcepage")
-                            Controller.AddMemodyString(RD.GetSourcePage());
-                        else if (line.Value.ToLower() == "cookies")
-                            Controller.AddMemodyString(RD.GetCookies());
-                        else
-                            Controller.AddMemodyString(line.Value);
-                        break;
-                    case OpCode.Ret:
-                        string val = line.Value;
-                        if (line.Value.ToLower().StartsWith("regex"))
-                            val = ParseRegex(line.Value);
-                        else if (line.Value.ToLower() == "sourcepage")
-                            val = RD.GetSourcePage();
-                        else if (line.Value.ToLower() == "cookies")
-                            val = RD.GetCookies();
-                        line.Value = val;
-                        ParseRetModule(line);
-                        break;
-                    case OpCode.SetConfig:
-                        string[] Res = line.Value.Split(':');
-                        ConfigDef cr = Controller.GetConfigdef(int.Parse(Res[0]));
-                        int indexd = li.Value.IndexOf(':');
-                        Instruction doc = Instruction.ReadLine(line.Value.Substring(indexd + 1, line.Value.Length - indexd - 1));
-                        doc = ReplaceMemoryStringsOnValue(doc);
-                        SetConfig(doc, cr);
-                        break;
-                    default:
-                        CMD.OutPuter.AddMessage("The" + line.Type.ToString() + " Module not support on Request method");
-                        break;
-                }
+                case MethodType.Base:
+                    ExecuteBaseInstruction(inst);
+                    break;
+                case MethodType.Request:
+                    ExecuteRequestInstruction(inst);
+                    break;
+                case MethodType.Print:
+                    ExecutePrintInstruction(inst);
+                    break;
+                case MethodType.Config:
+                    ExecuteConfigInstruction(inst);
+                    break;
             }
+        }
+        public void ExecuteRequestInstruction(Instruction line)
+        {
+            RequestDef RD = Controller.GetLastRequestDef();
+            switch (line.Type)
+            {
+                case OpCode.RequestManage:
+
+                    string[] Rs = line.Value.Split('.');
+
+                    ConfigDef cd = Controller.GetConfigdef(int.Parse(Rs[0]));
+                    RequestDef helper = null;
+                    if (Rs.Length >= 3)
+                    {
+                        try
+                        {
+                            if (Rs[2] == "this")
+                                helper = RD;
+                            else
+                                helper = Controller.GetRequestDef(int.Parse(Rs[2]));
+                        }
+                        catch { }
+                    }
+
+                    if (Rs[1].ToLower() == "getdata")
+                        RD = GetData(cd, helper);
+                    else if (Rs[1].ToLower() == "postdata")
+                        RD = PostData(cd, helper);
+
+                    break;
+                case OpCode.MemoryString:
+                    if (line.Value.ToLower().StartsWith("regex"))
+                        Controller.AddMemodyString(ParseRegex(line.Value));
+                    else if (line.Value.ToLower() == "sourcepage")
+                        Controller.AddMemodyString(RD.GetSourcePage());
+                    else if (line.Value.ToLower() == "cookies")
+                        Controller.AddMemodyString(RD.GetCookies());
+                    else
+                        Controller.AddMemodyString(line.Value);
+                    break;
+                case OpCode.Ret:
+                    string val = line.Value;
+                    if (line.Value.ToLower().StartsWith("regex"))
+                        val = ParseRegex(line.Value);
+                    else if (line.Value.ToLower() == "sourcepage")
+                        val = RD.GetSourcePage();
+                    else if (line.Value.ToLower() == "cookies")
+                        val = RD.GetCookies();
+                    line.Value = val;
+                    ParseRetModule(line);
+                    break;
+                case OpCode.SetConfig:
+                    string[] Res = line.Value.Split(':');
+                    ConfigDef cr = Controller.GetConfigdef(int.Parse(Res[0]));
+                    int indexd = line.Value.IndexOf(':');
+                    Instruction doc = Instruction.ReadLine(line.Value.Substring(indexd + 1, line.Value.Length - indexd - 1));
+                    ExecuteInstruction(doc, MethodType.Config);
+                    break;
+                default:
+                    CMD.OutPuter.AddMessage("The" + line.Type.ToString() + " Module not support on Request method");
+                    break;
+            }
+            Controller.SetLastRequestDef(RD);
         }
         private string ParseRegex(string value)
         {
@@ -166,25 +187,21 @@ namespace MSC.Script
             }
         }
 
-        public void ParsePrintMethod(Method method)
+        public void ExecutePrintInstruction(Instruction line)
         {
-            foreach (Instruction line in method.Instructions)
+            switch (line.Type)
             {
-                Instruction li = line;
-                li = ReplaceMemoryStringsOnValue(line);
-                switch (li.Type)
-                {
-                    case OpCode.MemoryString:
-                        Controller.AddMemodyString(li.Value);
-                        break;
-                    case OpCode.Ret:
-                        ParseRetModule(li);
-                        break;
-                    default:
-                        CMD.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Print method");
-                        break;
-                }
+                case OpCode.MemoryString:
+                    Controller.AddMemodyString(line.Value);
+                    break;
+                case OpCode.Ret:
+                    ParseRetModule(line);
+                    break;
+                default:
+                    CMD.OutPuter.AddMessage("The " + line.Type.ToString() + " Module not support on Print method");
+                    break;
             }
+
         }
         private void ParseRetModule(Instruction line)
         {
@@ -192,25 +209,20 @@ namespace MSC.Script
                 ParseMemoryString(line.Value);
             else CMD.OutPuter.AddMessage(line.Value, Log.Type.OutPut);
         }
-        public void ParseBaseMethod(Method method)
+        public void ExecuteBaseInstruction(Instruction line)
         {
-            foreach (Instruction line in method.Instructions)
-            {
-                Instruction li = line;
-                li = ReplaceMemoryStringsOnValue(line);
-                switch (li.Type)
+                switch (line.Type)
                 {
                     case OpCode.MemoryString:
-                        Controller.AddMemodyString(li.Value);
+                        Controller.AddMemodyString(line.Value);
                         break;
                     case OpCode.Ret:
-                        ParseRetModule(li);
+                        ParseRetModule(line);
                         break;
                     default:
-                        CMD.OutPuter.AddMessage("The " + li.Type.ToString() + " Module not support on Base method");
+                        CMD.OutPuter.AddMessage("The " + line.Type.ToString() + " Module not support on Base method");
                         break;
                 }
-            }
         }
         private void SetConfig(Instruction line, ConfigDef config)
         {
@@ -269,18 +281,13 @@ namespace MSC.Script
                     break;
             }
         }
-        public void ParseConfigMethod(Method method)
+        public void ExecuteConfigInstruction(Instruction line)
         {
-            Controller.NewConfigDef();
-            foreach(Instruction line in method.Instructions)
-            {
-                Instruction li = line;
-                li = ReplaceMemoryStringsOnValue(line);
-                if (li.Type == OpCode.MemoryString)
-                    Controller.AddMemodyString(li.Value);
-                else
-                    SetConfig(li, Controller.GetLastConfigdef());
-            }
+
+            if (line.Type == OpCode.MemoryString)
+                Controller.AddMemodyString(line.Value);
+            else
+                SetConfig(line, Controller.GetLastConfigdef());
 
         }
         public Instruction ReplaceMemoryStringsOnValue(Instruction line)
