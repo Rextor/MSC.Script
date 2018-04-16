@@ -6,6 +6,9 @@ you can run your script with msc.script
 Just write your script and Install methods with CommendLine and start script
 # Based on MSC
 This project just support msc methods for requests
+# IDE Project
+a full ide project for msc scripting
+https://github.com/Rextor/MSC.Script/tree/master/MSC%20Scripting%20IDE
 # Base Method
 Supported Instructions:
 - MemoryString
