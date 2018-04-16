@@ -12,7 +12,7 @@ Method=>GET
 ==>Request-1<==
 RequestManage=>1.getdata
 MemoryString=>sourcepage
-Memorystring=>Regex-2{"followed_by": {"count": (.*?)},}
+Memorystring=>Regex-2{<meta property="og:description" content="(.*?) Followers,}
 <==>
 
 ==>Print-1<==
