@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,7 @@ namespace MSC.Script
 {
     public class Controller
     {
-        List<string> MemoryString = new List<string>();
+        public List<string> MemoryString = new List<string>();
         public string GetMemoryString(int Index)
         {
             try {
@@ -55,7 +55,7 @@ namespace MSC.Script
             return strs;
         }
 
-        List<ConfigDef> ConfigDefes = new List<ConfigDef>();
+        public List<ConfigDef> ConfigDefes = new List<ConfigDef>();
         public void NewConfigDef()
         {
             ConfigDef configdef = new ConfigDef();
@@ -71,7 +71,7 @@ namespace MSC.Script
             return ConfigDefes[ConfigDefes.Count - 1];
         }
 
-        List<RequestDef> RequestDefes = new List<RequestDef>();
+        public List<RequestDef> RequestDefes = new List<RequestDef>();
         public void NewRequestDef()
         {
             RequestDef requestdef = new RequestDef();
@@ -85,6 +85,10 @@ namespace MSC.Script
         public RequestDef GetLastRequestDef()
         {
             return RequestDefes[RequestDefes.Count - 1];
+        }
+        public void SetLastRequestDef(RequestDef Requestdef)
+        {
+            RequestDefes[RequestDefes.Count - 1] = Requestdef;
         }
     }
 }
