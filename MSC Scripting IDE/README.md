@@ -7,7 +7,6 @@ you can debug your codes and see and change config, request, memorystring values
 - Detecte bad instructions
 ![bad](images/bad.png)
 - Debuge codes (line and line debugging)
-![debuge](images/debuge.png)
 - see and manage exception instructions
 ![error](images/error.png)
 # show and edit varibels at runtime (configs, requests, memorystrings)
