@@ -115,7 +115,7 @@ namespace MSC.Script
                     ConfigDef cr = Controller.GetConfigdef(int.Parse(Res[0]));
                     int indexd = line.Value.IndexOf(':');
                     Instruction doc = Instruction.ReadLine(line.Value.Substring(indexd + 1, line.Value.Length - indexd - 1));
-                    ExecuteInstruction(doc, MethodType.Config);
+                    SetConfig(doc, cr);
                     break;
                 default:
                     CMD.OutPuter.AddMessage("The" + line.Type.ToString() + " Module not support on Request method");
